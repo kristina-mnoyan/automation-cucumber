@@ -15,8 +15,8 @@ public class BaseTest {
     public void browserSetUp() {
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--start-maximized");
+        WebDriverManager.chromedriver().setup();
         chromeDriver = new ChromeDriver(chromeOptions);
-         WebDriverManager.chromedriver().setup();
         chromeDriver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
     }
 
