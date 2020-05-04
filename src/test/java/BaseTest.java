@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BaseTest {
 
-    WebDriver chromeDriver;
+    protected WebDriver chromeDriver;
 
     @BeforeClass
     public void browserSetUp() {

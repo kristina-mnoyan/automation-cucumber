@@ -1,3 +1,4 @@
+import lombok.SneakyThrows;
 import net.bytebuddy.utility.RandomString;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -11,90 +12,100 @@ import java.util.stream.Collectors;
 
 public class MailTest extends BaseTest {
 
-    private final String userName = "ns9970803@gmail.com";
-    private final String password = "Admin@123!";
     private final String randomEmailSubject = RandomString.make(10);
     private final String receiverEmailAddress = "ns27042020@gmail.com";
     private final String messageText = "Urgent message";
 
+    private WebElement writeButton;
+    private List<WebElement> draftMessages;
+
+    private WebElement receiverField;
+    private WebElement subjectField;
+    private WebElement messageField;
 
     @Test
-    public void successfullyLoginToGmailTest() {
+    public void loginToGmail() {
+
+        final String userName = "ns9970803@gmail.com";
+        final String password = "Admin@123!";
+        WebElement nextButton;
 
         chromeDriver.get("https://www.google.com/intl/hy/gmail/about/#");
 
-        WebElement signInButton = chromeDriver.findElement(By.cssSelector("ul.h-c-header__cta-list.header__nav--ltr > li:nth-child(2) > a"));
+        WebElement signInButton = chromeDriver.findElement(By.partialLinkText("Sign in"));
         signInButton.click();
 
-        ArrayList<String> tabs2 = new ArrayList<>(chromeDriver.getWindowHandles());
-        chromeDriver.switchTo().window(tabs2.get(0));
-        chromeDriver.close();
-        chromeDriver.switchTo().window(tabs2.get(1));
+        switchTab();
 
         WebElement userNameField = chromeDriver.findElement(By.id("identifierId"));
         userNameField.sendKeys(userName);
 
-        WebElement userNameNextButton = chromeDriver.findElement(By.id("identifierNext"));
-        userNameNextButton.click();
+        nextButton = chromeDriver.findElement(By.id("identifierNext"));
+        nextButton.click();
 
         WebElement passwordField = chromeDriver.findElement(By.name("password"));
         passwordField.click();
         passwordField.sendKeys(password);
 
-        WebElement passwordNextButton = chromeDriver.findElement(By.id("passwordNext"));
-        passwordNextButton.click();
+        nextButton = chromeDriver.findElement(By.id("passwordNext"));
+        nextButton.click();
 
-        List<WebElement> writeMessageButton = chromeDriver.findElements(By.xpath("//*[text()='Գրել']"));
+        writeButton = chromeDriver.findElement(By.xpath("//*[text()='Գրել']"));
 
-        Assert.assertEquals(writeMessageButton.size(), 1);
+        Assert.assertTrue(writeButton.isDisplayed());
     }
 
-    @Test(dependsOnMethods = "successfullyLoginToGmailTest")
-    public void createDraftMessageTest() {
+    @SneakyThrows
+    @Test(dependsOnMethods = "loginToGmail")
+    public void createDraftMessage() {
 
-        List<WebElement> writeMessageButton = chromeDriver.findElements(By.xpath("//*[text()='Գրել']"));
-        writeMessageButton.get(0).click();
+        writeButton.click();
 
-        WebElement messageToField = chromeDriver.findElement(By.name("to"));
-        messageToField.sendKeys(receiverEmailAddress);
+        receiverField = chromeDriver.findElement(By.name("to"));
+        receiverField.sendKeys(receiverEmailAddress);
 
-        WebElement subjectField = chromeDriver.findElement(By.name("subjectbox"));
+        subjectField = chromeDriver.findElement(By.name("subjectbox"));
         subjectField.sendKeys(randomEmailSubject);
 
-        WebElement messageTextField = chromeDriver.findElement(By.xpath("//div[@aria-label='Հաղորդագրության տեքստը']"));
-        messageTextField.sendKeys(messageText);
+        messageField = chromeDriver.findElement(By.xpath("//div[@aria-label='Հաղորդագրության տեքստը']"));
+        messageField.sendKeys(messageText);
 
-        WebElement closeMessagePopUpButton = chromeDriver.findElement(By.xpath("//img[contains(@aria-label, 'Պահել և փակել')]"));
+        WebElement closeMessagePopUpButton = chromeDriver.findElement(By.xpath("//*[@alt='Փակել']"));
         closeMessagePopUpButton.click();
 
-        WebElement draftsFolder = chromeDriver.findElement(By.xpath("//a[contains(@aria-label, 'Սևագրեր')]"));
+        Thread.sleep(2000);
+
+        WebElement draftsFolder = chromeDriver.findElement(By.linkText("Սևագրեր"));
         draftsFolder.click();
 
-        List<WebElement> draftMessageRows = chromeDriver.findElements(By.xpath("//tr[@class='zA yO']"));
+        draftMessages = chromeDriver.findElements(By.xpath("//*[@class='zA yO']"));
 
-        Assert.assertFalse(draftMessageRows.isEmpty());
+        //TODO will not work if there are other drafts
+        Assert.assertFalse(draftMessages.isEmpty());
     }
 
-    @Test(dependsOnMethods = {"successfullyLoginToGmailTest", "createDraftMessageTest"})
-    public void sendTheDraftedMessageTest() {
+    @SneakyThrows
+    @Test(dependsOnMethods = {"loginToGmail", "createDraftMessage"})
+    public void sendTheDraftedMessage() {
 
-        List<WebElement> draftMessageRows = chromeDriver.findElements(By.xpath("//tr[@class='zA yO']"));
-        draftMessageRows.get(0).click();
+        draftMessages.get(0).click();
 
-        WebElement toFieldAfterDraft = chromeDriver.findElement(By.xpath("//input[@name='to']"));
-        WebElement subjectFieldAfterDraft = chromeDriver.findElement(By.xpath("//input[@name='subject']"));
-        WebElement messageTextFieldAfterDraft = chromeDriver.findElement(By.xpath("//div[@aria-label='Հաղորդագրության տեքստը']"));
+        receiverField = chromeDriver.findElement(By.xpath("//input[@name='to']"));
+        subjectField = chromeDriver.findElement(By.xpath("//*[@name='subject']"));
+        messageField = chromeDriver.findElement(By.xpath("//div[@aria-label='Հաղորդագրության տեքստը']"));
 
         SoftAssert softAssert = new SoftAssert();
 
-        softAssert.assertEquals(toFieldAfterDraft.getAttribute("value"), receiverEmailAddress, "The email addresses don't match each other");
-        softAssert.assertEquals(subjectFieldAfterDraft.getAttribute("value"), randomEmailSubject, "The email subjects don't match each other");
-        softAssert.assertEquals(messageTextFieldAfterDraft.getText(), messageText, "The email texts don't match each other");
+        softAssert.assertEquals(receiverField.getAttribute("value"), receiverEmailAddress, "The email addresses don't match each other");
+        softAssert.assertEquals(subjectField.getAttribute("value"), randomEmailSubject, "The email subjects don't match each other");
+        softAssert.assertEquals(messageField.getText(), messageText, "The email texts don't match each other");
 
         softAssert.assertAll();
 
-        WebElement sendButton = chromeDriver.findElement(By.xpath("//div[contains(@aria-label, 'Ուղարկել')] "));
+        WebElement sendButton = chromeDriver.findElement(By.xpath("//*[text()='Ուղարկել']"));
         sendButton.click();
+
+        Thread.sleep(2000);
 
         List<String> draftFolderSubjects = chromeDriver.findElements(By.xpath("//span/span[text()='" + randomEmailSubject + "']"))
                 .stream()
@@ -104,10 +115,10 @@ public class MailTest extends BaseTest {
         Assert.assertTrue(draftFolderSubjects.isEmpty());
     }
 
-    @Test(dependsOnMethods = {"successfullyLoginToGmailTest", "createDraftMessageTest", "sendTheDraftedMessageTest"})
-    public void checkSentFolderTest() {
+    @Test(dependsOnMethods = {"loginToGmail", "createDraftMessage", "sendTheDraftedMessage"})
+    public void checkTheMessageIsSent() {
 
-        WebElement sentFolder = chromeDriver.findElement(By.xpath("//a[contains(@aria-label, 'Ուղարկված')]"));
+        WebElement sentFolder = chromeDriver.findElement(By.linkText("Ուղարկված"));
         sentFolder.click();
 
         List<String> sentFolderSubjects = chromeDriver.findElements(By.xpath("//span/span[text()='" + randomEmailSubject + "']"))
@@ -118,14 +129,20 @@ public class MailTest extends BaseTest {
         Assert.assertFalse(sentFolderSubjects.isEmpty());
     }
 
-    @Test(dependsOnMethods = {"successfullyLoginToGmailTest", "createDraftMessageTest", "sendTheDraftedMessageTest", "checkSentFolderTest"})
-    public void logOutFromTheSystemTest() {
+    @Test(dependsOnMethods = {"loginToGmail", "createDraftMessage", "sendTheDraftedMessage", "checkTheMessageIsSent"})
+    public void logoutFromGmail() {
 
-        WebElement userInfoButton = chromeDriver.findElement(By.xpath("//a[contains(@aria-label, 'Google հաշիվ')]"));
+        WebElement userInfoButton = chromeDriver.findElement(By.xpath("//*[contains(@aria-label, 'Google հաշիվ')]"));
         userInfoButton.click();
 
-        WebElement logOutButton = chromeDriver.findElement(By.xpath("//a[contains(text(), 'Դուրս գրվել')]"));
+        WebElement logOutButton = chromeDriver.findElement(By.xpath("//*[(text()='Դուրս գրվել')]"));
         logOutButton.click();
     }
-}
 
+    private void switchTab() {
+        ArrayList<String> browserTabs = new ArrayList<>(chromeDriver.getWindowHandles());
+        chromeDriver.switchTo().window(browserTabs.get(0));
+        chromeDriver.close();
+        chromeDriver.switchTo().window(browserTabs.get(1));
+    }
+}
