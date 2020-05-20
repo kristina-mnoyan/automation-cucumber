@@ -6,14 +6,15 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class PropertyLoader {
+public final class PropertyLoader {
+    private final String BASE_PATH = "src/main/resources/";
     private Properties properties;
     private InputStream inputStream;
 
     @SneakyThrows
-    public PropertyLoader(String filePath) {
+    public PropertyLoader(String path) {
         properties = new Properties();
-        inputStream = new FileInputStream(filePath);
+        inputStream = new FileInputStream(this.BASE_PATH + path);
         properties.load(inputStream);
     }
 

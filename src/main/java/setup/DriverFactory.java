@@ -57,6 +57,10 @@ public class DriverFactory {
             default:
                 createChromeDriver();
         }
+        driverCommonConfigs();
+    }
+
+    private void driverCommonConfigs() {
         driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
     }
 

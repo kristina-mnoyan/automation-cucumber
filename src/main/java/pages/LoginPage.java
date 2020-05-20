@@ -1,8 +1,8 @@
 package pages;
 
-import helpers.UiHelper;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import utils.UiUtils;
 
 public class LoginPage extends BasePage {
 
@@ -21,6 +21,9 @@ public class LoginPage extends BasePage {
     @FindBy(id = "passwordNext")
     private WebElement passwordNextButton;
 
+    @FindBy(xpath = "//span[text()='Ընտրեք հաշիվ']")
+    private WebElement chooseAnAccount;
+
     public void setUserName(String userName) {
         userNameField.sendKeys(userName);
     }
@@ -31,14 +34,18 @@ public class LoginPage extends BasePage {
 
     public void loginOperation() {
         signInButton.click();
-        UiHelper.switchToCurrentTab();
-        setUserName(app.getProperty("username"));
+        UiUtils.switchToCurrentTab();
+        setUserName(app.getProperty("USERNAME"));
         userNameNextButton.click();
-        setPassword(app.getProperty("password"));
+        setPassword(app.getProperty("PASSWORD"));
         passwordNextButton.click();
     }
 
     public boolean isUserNameFieldDisplayed() {
         return userNameField.isDisplayed();
+    }
+
+    public boolean isChooseAnAccountMessageDisplayed() {
+        return chooseAnAccount.isDisplayed();
     }
 }

@@ -1,14 +1,13 @@
-import config.PropertyLoader;
+import lombok.SneakyThrows;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import setup.DriverFactory;
 
 public class BaseTest {
 
-    protected PropertyLoader data = new PropertyLoader("src/main/resources/data.properties");
-
-
+    @SneakyThrows
     @AfterClass
     public void browserTearDown() {
-//        DriverFactory.quitDriver();
+//        Thread.sleep(200000);
+        DriverFactory.quitDriver();
     }
 }
