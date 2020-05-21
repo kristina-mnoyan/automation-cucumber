@@ -1,13 +1,28 @@
-import lombok.SneakyThrows;
+import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.annotations.AfterClass;
-import setup.DriverFactory;
+import org.testng.annotations.BeforeClass;
+
+import java.util.concurrent.TimeUnit;
 
 public class BaseTest {
 
-    @SneakyThrows
+    protected WebDriver chromeDriver;
+
+    @BeforeClass
+    public void browserSetUp() {
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--start-maximized");
+        WebDriverManager.chromedriver().setup();
+        chromeDriver = new ChromeDriver(chromeOptions);
+        chromeDriver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+    }
+
     @AfterClass
     public void browserTearDown() {
-//        Thread.sleep(200000);
-        DriverFactory.quitDriver();
+        chromeDriver.quit();
+        chromeDriver = null;
     }
 }
