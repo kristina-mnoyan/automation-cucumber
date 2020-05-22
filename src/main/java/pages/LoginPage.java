@@ -25,10 +25,12 @@ public class LoginPage extends BasePage {
     private WebElement chooseAnAccount;
 
     public void setUserName(String userName) {
+        UiUtils.setColorToTheField(userNameField);
         userNameField.sendKeys(userName);
     }
 
     public void setPassword(String password) {
+        UiUtils.setColorToTheField(passwordField);
         passwordField.sendKeys(password);
     }
 
@@ -39,10 +41,6 @@ public class LoginPage extends BasePage {
         userNameNextButton.click();
         setPassword(app.getProperty("PASSWORD"));
         passwordNextButton.click();
-    }
-
-    public boolean isUserNameFieldDisplayed() {
-        return userNameField.isDisplayed();
     }
 
     public boolean isChooseAnAccountMessageDisplayed() {

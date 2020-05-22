@@ -10,7 +10,10 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 
@@ -18,6 +21,14 @@ import java.util.concurrent.TimeUnit;
 public class DriverFactory {
 
     private WebDriver driver;
+
+    private void createRemoteDriver() {
+        try {
+            driver = new RemoteWebDriver(new URL("http://192.168.2.70:4444/wd/hub"), new ChromeOptions());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void createChromeDriver() {
         ChromeOptions chromeOptions = new ChromeOptions();
@@ -52,6 +63,9 @@ public class DriverFactory {
 
             case "firefox":
                 createFirefoxDriver();
+                break;
+            case "remote":
+                createRemoteDriver();
                 break;
             case "chrome":
             default:
