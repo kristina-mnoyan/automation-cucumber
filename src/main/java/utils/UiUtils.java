@@ -1,21 +1,22 @@
 package utils;
 
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
+import org.testng.ITestResult;
 import setup.DriverFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 
 @UtilityClass
 public class UiUtils {
 
-    private WebDriver driver = DriverFactory.getDriver();
-    private Actions actions = new Actions(driver);
-    private JavascriptExecutor javascriptExecutor = ((JavascriptExecutor) driver);
+    private final WebDriver driver = DriverFactory.getDriver();
+    private final Actions actions = new Actions(driver);
+    private final JavascriptExecutor javascriptExecutor = ((JavascriptExecutor) driver);
 
     public void switchToCurrentTab() {
         ArrayList<String> tabs = new ArrayList<>(driver.getWindowHandles());
@@ -48,5 +49,11 @@ public class UiUtils {
 
     public void scrollToWebElement(WebElement element) {
         javascriptExecutor.executeScript("arguments[0].scrollIntoView(true)", element);
+    }
+
+    @SneakyThrows
+    public void getScreenshot(ITestResult iTestResult) {
+        File file = ((TakesScreenshot) DriverFactory.getDriver()).getScreenshotAs(OutputType.FILE);
+        FileUtils.copyFile(file, new File("target\\screenshots\\" + CommonUtils.getCurrentTime() + iTestResult.getMethod().getMethodName() + ".png"));
     }
 }

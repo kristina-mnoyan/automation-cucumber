@@ -16,7 +16,7 @@ public class WaitUtils {
 
     private final WebDriver driver = DriverFactory.getDriver();
     private final WebDriverWait wait = new WebDriverWait(driver, DEFAULT_TIMEOUT);
-    private JavascriptExecutor javascriptExecutor = ((JavascriptExecutor) driver);
+    private final JavascriptExecutor javascriptExecutor = ((JavascriptExecutor) driver);
 
     public void waitForElementToBeClickable(WebElement element) {
         wait.until(ExpectedConditions.elementToBeClickable(element));
@@ -32,7 +32,7 @@ public class WaitUtils {
 
     public void waitForJsLoad() {
         wait
-                .until((ExpectedCondition<Boolean>) driver -> javascriptExecutor.executeScript("return document.readyState")
+                .until((ExpectedCondition<Boolean>) workingDriver -> javascriptExecutor.executeScript("return document.readyState")
                         .toString()
                         .equals("complete"));
     }
