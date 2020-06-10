@@ -7,7 +7,6 @@ import org.openqa.selenium.UnexpectedAlertBehaviour;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -23,63 +22,65 @@ public class DriverFactory {
 
     private WebDriver driver;
 
-    private void createRemoteDriver() {
+    private WebDriver createRemoteDriver() {
+        RemoteWebDriver driver;
         try {
             driver = new RemoteWebDriver(new URL("http://192.168.2.70:4444/wd/hub"), new ChromeOptions());
+            return driver;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
-    private void createChromeDriver() {
+    private WebDriver createChromeDriver() {
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--start-maximized");
         chromeOptions.addArguments("--ignore-certificate-errors");
         WebDriverManager.chromedriver().setup();
-
-        driver = new ChromeDriver(chromeOptions);
+        ChromeDriver driver = new ChromeDriver(chromeOptions);
+        return driver;
     }
 
-    private void createFirefoxDriver() {
+    private WebDriver createFirefoxDriver() {
         WebDriverManager.firefoxdriver().setup();
 
-        driver = new FirefoxDriver();
-        driver.manage().window().maximize();
+        FirefoxDriver driver = new FirefoxDriver();
         DesiredCapabilities firefox = DesiredCapabilities.firefox();
         firefox.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
+        return driver;
     }
 
-    private void createEdgeDriver() {
-        WebDriverManager.edgedriver().setup();
-
-        driver = new EdgeDriver();
-        driver.manage().window().maximize();
-    }
-
-    public void initDriver(String browser) {
+    private WebDriver initDriver(String browser) {
         switch (browser) {
-            case "edge":
-                createEdgeDriver();
-                break;
             case "firefox":
-                createFirefoxDriver();
+                driver = createFirefoxDriver();
                 break;
             case "remote":
-                createRemoteDriver();
+                driver = createRemoteDriver();
                 break;
             case "chrome":
             default:
-                createChromeDriver();
+                driver = createChromeDriver();
         }
         log.info("Started with browser " + browser);
         driverCommonConfigs();
+        return driver;
     }
 
     private void driverCommonConfigs() {
+        driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
     }
 
-    public WebDriver getDriver() {
+    public WebDriver getInstance(String browser) {
+        if (driver != null) {
+            return driver;
+        } else initDriver(browser);
+        return driver;
+    }
+
+    public WebDriver getInstance() {
         if (driver != null) {
             return driver;
         } else initDriver("chrome");
