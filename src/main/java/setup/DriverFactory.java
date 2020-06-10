@@ -2,6 +2,7 @@ package setup;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.experimental.UtilityClass;
+import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.UnexpectedAlertBehaviour;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -10,14 +11,25 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-
+@Log4j
 @UtilityClass
 public class DriverFactory {
 
     private WebDriver driver;
+
+    private void createRemoteDriver() {
+        try {
+            driver = new RemoteWebDriver(new URL("http://192.168.2.70:4444/wd/hub"), new ChromeOptions());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void createChromeDriver() {
         ChromeOptions chromeOptions = new ChromeOptions();
@@ -49,14 +61,17 @@ public class DriverFactory {
             case "edge":
                 createEdgeDriver();
                 break;
-
             case "firefox":
                 createFirefoxDriver();
+                break;
+            case "remote":
+                createRemoteDriver();
                 break;
             case "chrome":
             default:
                 createChromeDriver();
         }
+        log.info("Started with browser " + browser);
         driverCommonConfigs();
     }
 
@@ -65,6 +80,9 @@ public class DriverFactory {
     }
 
     public WebDriver getDriver() {
+        if (driver != null) {
+            return driver;
+        } else initDriver("chrome");
         return driver;
     }
 

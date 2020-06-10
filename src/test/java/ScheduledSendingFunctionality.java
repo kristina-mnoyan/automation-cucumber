@@ -1,12 +1,15 @@
 import lombok.SneakyThrows;
 import net.bytebuddy.utility.RandomString;
 import org.testng.Assert;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 import pages.LoginPage;
 import pages.Mailbox;
 import utils.CommonUtils;
+import utils.WaitUtils;
 
+@Listeners(BaseTest.class)
 public class ScheduledSendingFunctionality extends BaseTest {
 
     private final String SCHEDULED_DATE = CommonUtils.getFutureDateTime(4, "dd MMM, y թ.");
@@ -31,21 +34,20 @@ public class ScheduledSendingFunctionality extends BaseTest {
         mailbox.writeMessageOperation(RANDOM_EMAIL_SUBJECT);
         mailbox.scheduledSendingOperation(SCHEDULED_DATE, SCHEDULED_TIME);
         mailbox.clickScheduledFolderButton();
-        Thread.sleep(15000);
+        WaitUtils.hardWait(15000);
 
         SoftAssert softAssert = new SoftAssert();
+
         softAssert.assertTrue(mailbox.subjectTexts().contains(RANDOM_EMAIL_SUBJECT));
-//        softAssert.assertEquals(mailbox.getPlannedMailSendingTime(RANDOM_EMAIL_SUBJECT), SCHEDULED_TIME);
 
         softAssert.assertAll();
-
     }
 
     @SneakyThrows
     @Test(dependsOnMethods = {"successfullyLoginToGmailTest", "createScheduledMessageTest"})
     public void sendScheduledMessageTest() {
         mailbox.clickInboxFolderButton();
-        Thread.sleep(240000);
+        WaitUtils.hardWait(240000);
 
         Assert.assertTrue(mailbox.isMailUnread(RANDOM_EMAIL_SUBJECT));
     }

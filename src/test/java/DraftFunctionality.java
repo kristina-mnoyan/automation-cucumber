@@ -1,11 +1,13 @@
 import config.PropertyLoader;
 import net.bytebuddy.utility.RandomString;
 import org.testng.Assert;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 import pages.LoginPage;
 import pages.Mailbox;
 
+@Listeners(BaseTest.class)
 public class DraftFunctionality extends BaseTest {
 
     private final String RANDOM_EMAIL_SUBJECT = RandomString.make(10);

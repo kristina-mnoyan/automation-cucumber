@@ -78,15 +78,16 @@ public class Mailbox extends BasePage {
     @FindBy(xpath = "//tr[@class='zA yO']//span[@class='bog']/span")
     private List<WebElement> subjects;
 
+    @FindBy(xpath = "//span[text()='Բեռնվում է...']")
+    private WebElement loadingMessage;
+
     public void clickWriteMessageButton() {
         writeMessageButton.get(0).click();
     }
 
     public String getPlannedMailSendingTime(String subject) {
         String xPath = String.format("(//*[text()='%s']//ancestor::tr[@class='zA yO']//child::div[@class='by1 kE'])[2]", subject);
-//        return driver.findElement(By.xpath(xPath)).getText();
         return driver.findElement(By.xpath(xPath)).getAttribute("value");
-//        return driver.findElement(By.xpath(xPath)).getAttribute("innerHTML");
     }
 
     public boolean isMailUnread(String subject) {
@@ -110,21 +111,23 @@ public class Mailbox extends BasePage {
     @SneakyThrows
     public void clickDraftFolderButton() {
         draftsFolder.click();
-        Thread.sleep(2000);
+        WaitUtils.hardWait(2000);
     }
 
     @SneakyThrows
     public void clickSentFolderButton() {
         sentFolder.click();
-        Thread.sleep(2000);
+        WaitUtils.hardWait(3000);
     }
 
     public void clickScheduledFolderButton() {
-        scheduledFolder.click();
+        WaitUtils.waitForElementToBeClickable(scheduledFolder);
+        UiUtils.click(scheduledFolder);
     }
 
     public void clickInboxFolderButton() {
-        inboxFolder.click();
+        WaitUtils.waitForElementToBeClickable(inboxFolder);
+        UiUtils.click(inboxFolder);
     }
 
     public String getMessageToFieldValue() {
@@ -144,7 +147,7 @@ public class Mailbox extends BasePage {
     }
 
     public void clickSendButton() {
-        sendButton.click();
+        UiUtils.click(sendButton);
         WaitUtils.waitForElementToDisappear(sendButton);
     }
 
@@ -154,10 +157,6 @@ public class Mailbox extends BasePage {
 
     public boolean isWriteMessageButtonDisplayed() {
         return CommonUtils.isListEmpty(writeMessageButton);
-    }
-
-    public boolean isDraftMessageRowDisplayed() {
-        return CommonUtils.isListEmpty(draftMessageRows);
     }
 
     public void writeMessageOperation(String emailSubject) {
@@ -172,11 +171,11 @@ public class Mailbox extends BasePage {
     }
 
     public void clickUserInfoButton() {
-        userInfoButton.click();
+        UiUtils.click(userInfoButton);
     }
 
     public void clickLogOutButton() {
-        logOutButton.click();
+        UiUtils.click(logOutButton);
     }
 
     public void setScheduledTime(String scheduledTime) {
@@ -197,11 +196,9 @@ public class Mailbox extends BasePage {
         WaitUtils.waitForElementToBeVisible(scheduledSendingButton);
         scheduledSendingButton.click();
         chooseDateAndTimeButton.click();
-        Thread.sleep(2000);
+        WaitUtils.waitForElementToBeVisible(scheduleSendingButton);
         setScheduledDate(scheduledDate);
         setScheduledTime(scheduledTime);
-        WaitUtils.waitForElementToBeClickable(scheduleSendingButton);
         scheduleSendingButton.click();
-
     }
 }
