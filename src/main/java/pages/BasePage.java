@@ -9,8 +9,7 @@ public abstract class BasePage {
     protected static WebDriver driver;
 
     static {
-        DriverFactory.initDriver(System.getProperty("browser", "chrome"));
-        driver = DriverFactory.getDriver();
+        driver = DriverFactory.getInstance(System.getProperty("browser", "chrome"));
     }
 
     protected PropertyLoader app = new PropertyLoader("app.properties");
@@ -24,5 +23,4 @@ public abstract class BasePage {
     public void get() {
         driver.get(BASE_URL);
     }
-
 }
