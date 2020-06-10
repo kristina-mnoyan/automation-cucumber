@@ -14,7 +14,7 @@ import setup.DriverFactory;
 public class WaitUtils {
     private final int DEFAULT_TIMEOUT = 20;
 
-    private final WebDriver driver = DriverFactory.getDriver();
+    private final WebDriver driver = DriverFactory.getInstance();
     private final WebDriverWait wait = new WebDriverWait(driver, DEFAULT_TIMEOUT);
     private final JavascriptExecutor javascriptExecutor = ((JavascriptExecutor) driver);
 

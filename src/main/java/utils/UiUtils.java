@@ -14,7 +14,7 @@ import java.util.ArrayList;
 @UtilityClass
 public class UiUtils {
 
-    private final WebDriver driver = DriverFactory.getDriver();
+    private final WebDriver driver = DriverFactory.getInstance();
     private final Actions actions = new Actions(driver);
     private final JavascriptExecutor javascriptExecutor = ((JavascriptExecutor) driver);
 
@@ -53,7 +53,7 @@ public class UiUtils {
 
     @SneakyThrows
     public void getScreenshot(ITestResult iTestResult) {
-        File file = ((TakesScreenshot) DriverFactory.getDriver()).getScreenshotAs(OutputType.FILE);
+        File file = ((TakesScreenshot) DriverFactory.getInstance()).getScreenshotAs(OutputType.FILE);
         FileUtils.copyFile(file, new File("target\\screenshots\\" + CommonUtils.getCurrentTime() + iTestResult.getMethod().getMethodName() + ".png"));
     }
 }

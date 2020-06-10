@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class CommonUtils {
-    private final WebDriver driver = DriverFactory.getDriver();
+    private final WebDriver driver = DriverFactory.getInstance();
 
     public boolean isListEmpty(final List list) {
         return list.isEmpty();
