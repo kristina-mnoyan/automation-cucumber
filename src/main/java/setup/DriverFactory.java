@@ -2,6 +2,7 @@ package setup;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.experimental.UtilityClass;
+import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.UnexpectedAlertBehaviour;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -16,7 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-
+@Log4j
 @UtilityClass
 public class DriverFactory {
 
@@ -60,7 +61,6 @@ public class DriverFactory {
             case "edge":
                 createEdgeDriver();
                 break;
-
             case "firefox":
                 createFirefoxDriver();
                 break;
@@ -71,6 +71,7 @@ public class DriverFactory {
             default:
                 createChromeDriver();
         }
+        log.info("Started with browser " + browser);
         driverCommonConfigs();
     }
 
@@ -79,6 +80,9 @@ public class DriverFactory {
     }
 
     public WebDriver getDriver() {
+        if (driver != null) {
+            return driver;
+        } else initDriver("chrome");
         return driver;
     }
 

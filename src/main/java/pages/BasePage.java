@@ -9,7 +9,7 @@ public abstract class BasePage {
     protected static WebDriver driver;
 
     static {
-        DriverFactory.initDriver("chrome");
+        DriverFactory.initDriver(System.getProperty("browser", "chrome"));
         driver = DriverFactory.getDriver();
     }
 

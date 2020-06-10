@@ -6,15 +6,17 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import setup.DriverFactory;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
 @UtilityClass
 public class CommonUtils {
-    private WebDriver driver = DriverFactory.getDriver();
+    private final WebDriver driver = DriverFactory.getDriver();
 
     public boolean isListEmpty(final List list) {
         return list.isEmpty();
@@ -36,5 +38,9 @@ public class CommonUtils {
                 .ofPattern(pattern, new Locale("hy", "AM"))
                 .format(LocalDateTime.now()
                         .plusMinutes(plusMinutes));
+    }
+
+    public String getCurrentTime() {
+        return new SimpleDateFormat("yyyy.MM.dd - HH mm ss.SSS ").format(new Date());
     }
 }
