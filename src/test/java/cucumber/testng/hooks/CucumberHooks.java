@@ -1,10 +1,13 @@
+package cucumber.testng.hooks;
+
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
-import org.testng.annotations.AfterClass;
 import setup.DriverFactory;
 import utils.UiUtils;
 
-public class BaseTest extends TestListenerAdapter {
+public class CucumberHooks extends TestListenerAdapter {
 
     @Override
     public void onTestFailure(ITestResult iTestResult) {
@@ -12,8 +15,13 @@ public class BaseTest extends TestListenerAdapter {
         UiUtils.getScreenshot(iTestResult);
     }
 
-    @AfterClass
+    @Before("@ui")
+    public void startBrowser() {
+        DriverFactory.getInstance();
+    }
+
+    @After("@ui")
     public void browserTearDown() {
-        DriverFactory.quitDriver();
+//        DriverFactory.quitDriver();
     }
 }

@@ -2,6 +2,7 @@ package pages;
 
 import lombok.SneakyThrows;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import utils.CommonUtils;
@@ -29,9 +30,6 @@ public class Mailbox extends BasePage {
 
     @FindBy(linkText = "Սևագրեր")
     private WebElement draftsFolder;
-
-    @FindBy(xpath = "//*[@class='zA yO']")
-    private List<WebElement> draftMessageRows;
 
     @FindBy(xpath = "//input[@name='to']")
     private WebElement toFieldAfterDraft;
@@ -81,6 +79,9 @@ public class Mailbox extends BasePage {
     @FindBy(xpath = "//span[text()='Բեռնվում է...']")
     private WebElement loadingMessage;
 
+    @FindBy(xpath = "//input[@aria-label='Որոնեք նամակներ']")
+    private WebElement searchField;
+
     public void clickWriteMessageButton() {
         writeMessageButton.get(0).click();
     }
@@ -93,6 +94,16 @@ public class Mailbox extends BasePage {
     public boolean isMailUnread(String subject) {
         String xPath = String.format("//*[text()='%s']//ancestor::tr[@class='zA zE']", subject);
         return driver.findElements(By.xpath(xPath)).size() == 1;
+    }
+
+    public void clickOnDraftMessage(String subject) {
+        String xPath = String.format("//*[text()='%s']//ancestor::tr[@class='zA yO']", subject);
+        driver.findElement(By.xpath(xPath)).click();
+    }
+
+    public int getMessageCount() {
+        String xPath = "//*[@class='y6']";
+        return driver.findElements(By.xpath(xPath)).size();
     }
 
     public void setMessageToField(String messageToValue) {
@@ -151,19 +162,23 @@ public class Mailbox extends BasePage {
         WaitUtils.waitForElementToDisappear(sendButton);
     }
 
-    public void clickOnDraftMessage() {
-        draftMessageRows.get(1).click();
-    }
-
     public boolean isWriteMessageButtonDisplayed() {
         return CommonUtils.isListEmpty(writeMessageButton);
     }
 
-    public void writeMessageOperation(String emailSubject) {
+    public void writeMessageOperation(String emailSubject, String messageType) {
         clickWriteMessageButton();
-        setMessageToField(data.getProperty("RECEIVER_EMAIL_ADDRESS"));
+        switch (messageType) {
+            case "scheduled":
+                setMessageToField(data.getProperty("SCHEDULED_MESSAGE_RECEIVER_ADDRESS"));
+                setMessageText(data.getProperty("SCHEDULED_MESSAGE_TEXT"));
+                break;
+            case "draft":
+            default:
+                setMessageToField(data.getProperty("RECEIVER_EMAIL_ADDRESS"));
+                setMessageText(data.getProperty("MESSAGE_TEXT"));
+        }
         setSubjectField(emailSubject);
-        setMessageText(data.getProperty("MESSAGE_TEXT"));
     }
 
     public List<String> subjectTexts() {
@@ -200,5 +215,18 @@ public class Mailbox extends BasePage {
         setScheduledDate(scheduledDate);
         setScheduledTime(scheduledTime);
         scheduleSendingButton.click();
+    }
+
+    public void searchOperation(String searchText) {
+        UiUtils.clearAndType(searchField, searchText);
+        searchField.sendKeys(Keys.ENTER);
+        WaitUtils.hardWait(5000);
+    }
+
+    public void goToFolder(String folder) {
+        String url = String.format("https://mail.google.com/mail/u/0/#%s", folder);
+        driver.get(url);
+        driver.navigate().refresh();
+        WaitUtils.hardWait(7000);
     }
 }

@@ -35,8 +35,7 @@ public class LoginPage extends BasePage {
     }
 
     public void loginOperation() {
-        signInButton.click();
-        UiUtils.switchToCurrentTab();
+        driver.get(app.getProperty("SIGN_IN_URL"));
         setUserName(app.getProperty("USERNAME"));
         userNameNextButton.click();
         setPassword(app.getProperty("PASSWORD"));
