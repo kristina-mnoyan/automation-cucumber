@@ -8,35 +8,22 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-@Log4j
 @UtilityClass
+@Log4j
 public class DriverFactory {
 
     private WebDriver driver;
-
-    private WebDriver createRemoteDriver() {
-        RemoteWebDriver driver;
-        try {
-            driver = new RemoteWebDriver(new URL("http://192.168.2.70:4444/wd/hub"), new ChromeOptions());
-            return driver;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     private WebDriver createChromeDriver() {
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--start-maximized");
         chromeOptions.addArguments("--ignore-certificate-errors");
+        chromeOptions.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
         WebDriverManager.chromedriver().setup();
         ChromeDriver driver = new ChromeDriver(chromeOptions);
         return driver;
@@ -45,9 +32,9 @@ public class DriverFactory {
     private WebDriver createFirefoxDriver() {
         WebDriverManager.firefoxdriver().setup();
 
-        FirefoxDriver driver = new FirefoxDriver();
-        DesiredCapabilities firefox = DesiredCapabilities.firefox();
-        firefox.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
+        FirefoxOptions firefoxOptions = new FirefoxOptions();
+        firefoxOptions.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
+        FirefoxDriver driver = new FirefoxDriver(firefoxOptions);
         return driver;
     }
 
@@ -55,9 +42,6 @@ public class DriverFactory {
         switch (browser) {
             case "firefox":
                 driver = createFirefoxDriver();
-                break;
-            case "remote":
-                driver = createRemoteDriver();
                 break;
             case "chrome":
             default:
@@ -70,6 +54,7 @@ public class DriverFactory {
 
     private void driverCommonConfigs() {
         driver.manage().window().maximize();
+        driver.manage().deleteAllCookies();
         driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
     }
 
@@ -89,5 +74,6 @@ public class DriverFactory {
 
     public void quitDriver() {
         driver.quit();
+        driver = null;
     }
 }

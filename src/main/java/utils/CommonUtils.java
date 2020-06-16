@@ -43,4 +43,12 @@ public class CommonUtils {
     public String getCurrentTime() {
         return new SimpleDateFormat("yyyy.MM.dd - HH mm ss.SSS ").format(new Date());
     }
+
+    public boolean isLastPartFromUrlEqualToFolderName(String folderName) {
+        return driver.getCurrentUrl().endsWith(folderName);
+    }
+
+    public String getLastPartFromCurrentUrl() {
+        return driver.getCurrentUrl().substring(driver.getCurrentUrl().lastIndexOf('#') + 1);
+    }
 }
